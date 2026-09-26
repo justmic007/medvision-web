@@ -1,4 +1,11 @@
 // API client — the single seam between the frontend and the FastAPI backend.
+//
+// Auth model (httpOnly cookie pattern):
+//   - The refresh token lives in an httpOnly cookie the browser sends
+//     automatically (we set credentials: "include").
+//   - The access token is held in memory here (never in localStorage), attached
+//     as a Bearer header. On a 401 we transparently refresh once and retry.
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export class ApiError extends Error {
@@ -8,26 +15,75 @@ export class ApiError extends Error {
   }
 }
 
+// --- In-memory access token ---
+let accessToken: string | null = null;
+export function setAccessToken(token: string | null) {
+  accessToken = token;
+}
+export function getAccessToken() {
+  return accessToken;
+}
+
 type Options = Omit<RequestInit, "body"> & { body?: unknown };
 
-export async function api<T>(path: string, options: Options = {}): Promise<T> {
+// Endpoints that must NOT trigger the refresh-retry loop (to avoid recursion).
+const NO_RETRY = ["/auth/login", "/auth/refresh", "/auth/register"];
+
+async function request<T>(path: string, options: Options, retry: boolean): Promise<T> {
   const { body, headers, ...rest } = options;
+
   const res = await fetch(`${API_URL}${path}`, {
     ...rest,
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...headers },
+    credentials: "include", // send/receive the httpOnly refresh cookie
+    headers: {
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      ...headers,
+    },
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
+
+  // On 401, try to refresh the access token once, then retry the original call.
+  if (res.status === 401 && retry && !NO_RETRY.includes(path)) {
+    const refreshed = await tryRefresh();
+    if (refreshed) {
+      return request<T>(path, options, false); // retry once, no further retry
+    }
+  }
+
   if (!res.ok) {
     let detail = res.statusText;
     try {
       const data = await res.json();
       detail = data.detail ?? detail;
-    } catch {}
+    } catch {
+      // not JSON
+    }
     throw new ApiError(res.status, detail);
   }
+
   const text = await res.text();
   return text ? (JSON.parse(text) as T) : (undefined as T);
+}
+
+// Attempt to mint a new access token from the httpOnly refresh cookie.
+async function tryRefresh(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_URL}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+    });
+    if (!res.ok) return false;
+    const data = (await res.json()) as { access_token: string };
+    accessToken = data.access_token;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function api<T>(path: string, options: Options = {}): Promise<T> {
+  return request<T>(path, options, true);
 }
 
 export function getHealth() {
