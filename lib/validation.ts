@@ -39,3 +39,14 @@ export function validateImageFile(file: File): string | null {
   if (file.size > MAX_UPLOAD_BYTES) return "File is too large (max 10 MB).";
   return null; // valid
 }
+
+
+// Patient form validation.
+export const patientSchema = z.object({
+  first_name: z.string().min(1, "First name is required").max(100),
+  last_name: z.string().min(1, "Last name is required").max(100),
+  sex: z.enum(["male", "female", "other"]),
+  age: z.number().int().min(0, "Age must be 0 or more").max(150),
+});
+
+export type PatientFormValues = z.infer<typeof patientSchema>;
