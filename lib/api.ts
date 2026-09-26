@@ -89,3 +89,44 @@ export function api<T>(path: string, options: Options = {}): Promise<T> {
 export function getHealth() {
   return api<{ status: string; app: string; version: string }>("/health");
 }
+
+
+// Multipart upload (for /analyze). FormData sets its own Content-Type boundary,
+// so we must NOT set Content-Type ourselves. Reuses the access token + refresh.
+async function requestForm<T>(
+  path: string,
+  form: FormData,
+  retry: boolean
+): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+    body: form,
+  });
+
+  if (res.status === 401 && retry) {
+    const refreshed = await tryRefresh();
+    if (refreshed) return requestForm<T>(path, form, false);
+  }
+
+  if (!res.ok) {
+    let detail = res.statusText;
+    try {
+      const data = await res.json();
+      detail = data.detail ?? detail;
+    } catch {
+      // not JSON
+    }
+    throw new ApiError(res.status, detail);
+  }
+
+  const text = await res.text();
+  return text ? (JSON.parse(text) as T) : (undefined as T);
+}
+
+export function apiUpload<T>(path: string, form: FormData): Promise<T> {
+  return requestForm<T>(path, form, true);
+}

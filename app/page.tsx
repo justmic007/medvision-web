@@ -9,7 +9,6 @@ function Dashboard() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
-      {/* Header: stacks on mobile, row on larger screens */}
       <header className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
@@ -36,9 +35,14 @@ function Dashboard() {
         <div className="rounded-xl border p-6 sm:p-8">
           <h2 className="text-lg font-semibold sm:text-xl">Welcome back</h2>
           <p className="mt-2 text-base text-muted-foreground">
-            You&apos;re signed in as a {user?.role}. The analysis, patients, and
-            cases views arrive in the next phases.
+            You are signed in as a {user?.role}.
           </p>
+          <a
+            href="/analyze"
+            className="mt-4 inline-block rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background"
+          >
+            Analyze a chest X-ray
+          </a>
         </div>
       </section>
     </main>
