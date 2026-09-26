@@ -24,3 +24,18 @@ export const registerSchema = z.object({
 
 export type LoginValues = z.infer<typeof loginSchema>;
 export type RegisterValues = z.infer<typeof registerSchema>;
+
+
+// File-upload limits — mirror the backend's /analyze guards.
+export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // 10 MB
+export const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg"];
+export const ALLOWED_EXTENSIONS = [".png", ".jpg", ".jpeg"];
+
+export function validateImageFile(file: File): string | null {
+  const okType =
+    ALLOWED_IMAGE_TYPES.includes(file.type) ||
+    ALLOWED_EXTENSIONS.some((ext) => file.name.toLowerCase().endsWith(ext));
+  if (!okType) return "Please upload a PNG or JPG chest X-ray.";
+  if (file.size > MAX_UPLOAD_BYTES) return "File is too large (max 10 MB).";
+  return null; // valid
+}
