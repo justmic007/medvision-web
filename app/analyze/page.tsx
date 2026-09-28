@@ -1,10 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Protected } from "@/components/protected";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api";
 import { analyzeImage } from "@/lib/analysis";
+import { listPatients } from "@/lib/patients";
+import type { Patient } from "@/types/patient";
 import { validateImageFile } from "@/lib/validation";
 import type { AnalysisResponse } from "@/types/analysis";
 
@@ -16,6 +18,12 @@ function AnalyzeView() {
   const [analyzing, setAnalyzing] = useState(false);
   const [serverError, setServerError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [patientId, setPatientId] = useState<string>("");
+
+  useEffect(() => {
+    listPatients().then(setPatients).catch(() => setPatients([]));
+  }, []);
 
   function pickFile(f: File | null) {
     setServerError("");
@@ -39,7 +47,7 @@ function AnalyzeView() {
     setServerError("");
     setResult(null);
     try {
-      const res = await analyzeImage(file);
+      const res = await analyzeImage(file, patientId || undefined);
       setResult(res);
     } catch (err) {
       setServerError(
@@ -102,6 +110,23 @@ function AnalyzeView() {
           {fileError ? (
             <p className="mt-2 text-sm text-red-600">{fileError}</p>
           ) : null}
+          <div className="mt-4">
+            <label className="text-sm font-medium">
+              Save as a case for a patient (optional)
+            </label>
+            <select
+              value={patientId}
+              onChange={(e) => setPatientId(e.target.value)}
+              className="mt-1 w-full rounded-lg border px-3 py-2 text-base"
+            >
+              <option value="">No patient (one-off analysis)</option>
+              {patients.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.first_name} {p.last_name} ({p.mrn})
+                </option>
+              ))}
+            </select>
+          </div>
           <Button
             onClick={onAnalyze}
             disabled={!file || analyzing}

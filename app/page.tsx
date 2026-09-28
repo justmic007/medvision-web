@@ -37,12 +37,20 @@ function Dashboard() {
           <p className="mt-2 text-base text-muted-foreground">
             You are signed in as a {user?.role}.
           </p>
-          <a
-            href="/analyze"
-            className="mt-4 inline-block rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background"
-          >
-            Analyze a chest X-ray
-          </a>
+                    <div className="mt-4 flex flex-wrap gap-3">
+            <a
+              href="/analyze"
+              className="inline-block rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background"
+            >
+              Analyze a chest X-ray
+            </a>
+            <a
+              href="/patients"
+              className="inline-block rounded-lg border px-5 py-2.5 text-sm font-medium"
+            >
+              Patients
+            </a>
+          </div>
         </div>
       </section>
     </main>

@@ -130,3 +130,23 @@ async function requestForm<T>(
 export function apiUpload<T>(path: string, form: FormData): Promise<T> {
   return requestForm<T>(path, form, true);
 }
+
+
+// Fetch a binary resource (e.g. a stored scan) with auth, returning a Blob.
+// Refreshes the access token once on 401, like the JSON path.
+export async function apiBlob(path: string, retry = true): Promise<Blob> {
+  const res = await fetch(`${API_URL}${path}`, {
+    credentials: "include",
+    headers: {
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+  });
+  if (res.status === 401 && retry) {
+    const refreshed = await tryRefresh();
+    if (refreshed) return apiBlob(path, false);
+  }
+  if (!res.ok) {
+    throw new ApiError(res.status, res.statusText);
+  }
+  return res.blob();
+}

@@ -3,9 +3,12 @@
 import { apiUpload } from "@/lib/api";
 import type { AnalysisResponse } from "@/types/analysis";
 
-export function analyzeImage(file: File): Promise<AnalysisResponse> {
+export function analyzeImage(
+  file: File,
+  patientId?: string
+): Promise<AnalysisResponse> {
   const form = new FormData();
   form.append("file", file);
-  // patient_id is optional; F2 analyzes without persistence (F3 adds patients).
+  if (patientId) form.append("patient_id", patientId);
   return apiUpload<AnalysisResponse>("/analyze", form);
 }
