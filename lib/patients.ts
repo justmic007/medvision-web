@@ -1,6 +1,6 @@
 // Patient and case API calls.
 
-import { api } from "@/lib/api";
+import { api, apiBlob } from "@/lib/api";
 import type {
   CaseDetail,
   CaseSummary,
@@ -26,4 +26,8 @@ export function getCase(id: string) {
 
 export function getPatientCases(patientId: string) {
   return api<CaseSummary[]>(`/patients/${patientId}/cases`);
+}
+
+export function getScanBlob(caseId: string) {
+  return apiBlob(`/cases/${caseId}/scan`);
 }
