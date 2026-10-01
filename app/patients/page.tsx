@@ -96,7 +96,7 @@ function PatientsView() {
 
 export default function PatientsPage() {
   return (
-    <Protected>
+    <Protected requireClinician>
       <PatientsView />
     </Protected>
   );
