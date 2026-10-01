@@ -38,18 +38,30 @@ function Dashboard() {
             You are signed in as a {user?.role}.
           </p>
                     <div className="mt-4 flex flex-wrap gap-3">
-            <a
-              href="/analyze"
-              className="inline-block rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background"
-            >
-              Analyze a chest X-ray
-            </a>
-            <a
-              href="/patients"
-              className="inline-block rounded-lg border px-5 py-2.5 text-sm font-medium"
-            >
-              Patients
-            </a>
+            {user?.role === "clinician" ? (
+              <>
+                <a
+                  href="/analyze"
+                  className="inline-block rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background"
+                >
+                  Analyze a chest X-ray
+                </a>
+                <a
+                  href="/patients"
+                  className="inline-block rounded-lg border px-5 py-2.5 text-sm font-medium"
+                >
+                  Patients
+                </a>
+              </>
+            ) : null}
+            {user?.role === "admin" ? (
+              <a
+                href="/admin"
+                className="inline-block rounded-lg border px-5 py-2.5 text-sm font-medium"
+              >
+                Admin
+              </a>
+            ) : null}
           </div>
         </div>
       </section>

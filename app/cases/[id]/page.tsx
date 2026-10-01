@@ -156,7 +156,7 @@ function CaseDetailView() {
 
 export default function CaseDetailPage() {
   return (
-    <Protected>
+    <Protected requireClinician>
       <CaseDetailView />
     </Protected>
   );

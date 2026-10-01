@@ -244,7 +244,7 @@ function Findings({ result }: { result: AnalysisResponse }) {
 
 export default function AnalyzePage() {
   return (
-    <Protected>
+    <Protected requireClinician>
       <AnalyzeView />
     </Protected>
   );
