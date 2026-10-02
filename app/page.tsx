@@ -2,70 +2,91 @@
 
 import { useAuth } from "@/lib/auth-context";
 import { Protected } from "@/components/protected";
-import { Button } from "@/components/ui/button";
+import { AppHeader } from "@/components/app-header";
 
 function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const isClinician = user?.role === "clinician";
+  const isAdmin = user?.role === "admin";
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
-      <header className="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            MedVision AI
-          </h1>
-          <p className="mt-1 text-base text-muted-foreground">
-            Chest X-ray decision support
-          </p>
-        </div>
-        <div className="flex items-center justify-between gap-4 sm:justify-end">
-          <div className="text-left sm:text-right">
-            <p className="text-sm font-medium sm:text-base">{user?.email}</p>
-            <p className="text-sm capitalize text-muted-foreground">
-              {user?.role}
-            </p>
-          </div>
-          <Button variant="outline" size="lg" onClick={() => logout()}>
-            Sign out
-          </Button>
-        </div>
-      </header>
+    <div className="min-h-screen">
+      <AppHeader />
+      <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+        <p className="font-mono text-xs uppercase tracking-widest text-primary">
+          {user?.role} workspace
+        </p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
+          {isClinician ? "What would you like to do?" : "Manage access"}
+        </h1>
+        <p className="mt-2 max-w-xl text-muted-foreground">
+          {isClinician
+            ? "Analyze a chest radiograph, or review your patients and their case history."
+            : "Review and manage clinician access to the platform."}
+        </p>
 
-      <section className="mt-10">
-        <div className="rounded-xl border p-6 sm:p-8">
-          <h2 className="text-lg font-semibold sm:text-xl">Welcome back</h2>
-          <p className="mt-2 text-base text-muted-foreground">
-            You are signed in as a {user?.role}.
-          </p>
-                    <div className="mt-4 flex flex-wrap gap-3">
-            {user?.role === "clinician" ? (
-              <>
-                <a
-                  href="/analyze"
-                  className="inline-block rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background"
-                >
-                  Analyze a chest X-ray
-                </a>
-                <a
-                  href="/patients"
-                  className="inline-block rounded-lg border px-5 py-2.5 text-sm font-medium"
-                >
-                  Patients
-                </a>
-              </>
-            ) : null}
-            {user?.role === "admin" ? (
-              <a
-                href="/admin"
-                className="inline-block rounded-lg border px-5 py-2.5 text-sm font-medium"
-              >
-                Admin
-              </a>
-            ) : null}
-          </div>
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {isClinician ? (
+            <>
+              <ActionCard
+                href="/analyze"
+                title="Analyze a chest X-ray"
+                body="Upload a radiograph for findings, visual explanation, and cited evidence."
+                primary
+              />
+              <ActionCard
+                href="/patients"
+                title="Patients"
+                body="Your patient records and their saved case history."
+              />
+            </>
+          ) : null}
+          {isAdmin ? (
+            <ActionCard
+              href="/admin"
+              title="Clinicians"
+              body="Approve, suspend, or reinstate clinician access."
+              primary
+            />
+          ) : null}
         </div>
-      </section>
-    </main>
+      </main>
+    </div>
+  );
+}
+
+function ActionCard({
+  href,
+  title,
+  body,
+  primary = false,
+}: {
+  href: string;
+  title: string;
+  body: string;
+  primary?: boolean;
+}) {
+  return (
+    <a
+      href={href}
+      className={
+        "group flex flex-col rounded-xl border p-6 transition-colors " +
+        (primary
+          ? "border-primary/30 bg-primary/5 hover:bg-primary/10"
+          : "hover:bg-muted/50")
+      }
+    >
+      <h2 className="text-lg font-semibold">{title}</h2>
+      <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+      <span
+        className={
+          "mt-4 text-sm font-medium " +
+          (primary ? "text-primary" : "text-foreground")
+        }
+      >
+        Open
+      </span>
+    </a>
   );
 }
 

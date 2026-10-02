@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/protected";
+import { AppHeader } from "@/components/app-header";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/lib/api";
 import { listPatients } from "@/lib/patients";
@@ -22,75 +23,83 @@ function PatientsView() {
   }, []);
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            Patients
-          </h1>
-          <p className="mt-1 text-base text-muted-foreground">
-            Your patients and their scan history.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <a href="/" className="text-sm underline">
-            Dashboard
-          </a>
+    <div className="min-h-screen">
+      <AppHeader />
+      <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-widest text-primary">
+              Records
+            </p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight">
+              Patients
+            </h1>
+            <p className="mt-2 text-muted-foreground">
+              Your patients and their case history.
+            </p>
+          </div>
           <a href="/patients/new">
             <Button size="lg">Add patient</Button>
           </a>
         </div>
-      </div>
 
-      {loading ? (
-        <p className="text-sm text-muted-foreground">Loading...</p>
-      ) : error ? (
-        <p className="text-sm text-red-600">{error}</p>
-      ) : patients.length === 0 ? (
-        <div className="rounded-xl border p-8 text-center">
-          <p className="text-base font-medium">No patients yet</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Add your first patient to start building case history.
-          </p>
-        </div>
-      ) : (
-        <div className="overflow-hidden rounded-xl border">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b bg-muted/40">
-              <tr>
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">MRN</th>
-                <th className="px-4 py-3 font-medium">Sex</th>
-                <th className="px-4 py-3 font-medium">Age</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {patients.map((p) => (
-                <tr key={p.id} className="border-b last:border-0">
-                  <td className="px-4 py-3 font-medium">
-                    {p.first_name} {p.last_name}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">{p.mrn}</td>
-                  <td className="px-4 py-3 capitalize text-muted-foreground">
-                    {p.sex}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">{p.age}</td>
-                  <td className="px-4 py-3 text-right">
-                    <a
-                      href={"/patients/" + p.id}
-                      className="text-sm underline"
-                    >
-                      View
-                    </a>
-                  </td>
+        {loading ? (
+          <p className="mt-8 text-sm text-muted-foreground">Loading...</p>
+        ) : error ? (
+          <p className="mt-8 text-sm text-destructive">{error}</p>
+        ) : patients.length === 0 ? (
+          <div className="mt-8 rounded-xl border border-dashed border-border p-10 text-center">
+            <p className="font-medium">No patients yet</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Add your first patient to start building case history.
+            </p>
+            <a href="/patients/new" className="mt-4 inline-block">
+              <Button>Add patient</Button>
+            </a>
+          </div>
+        ) : (
+          <div className="mt-8 overflow-hidden rounded-xl border border-border">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-border bg-muted/40">
+                <tr className="text-muted-foreground">
+                  <th className="px-4 py-3 font-medium">Name</th>
+                  <th className="px-4 py-3 font-medium">MRN</th>
+                  <th className="px-4 py-3 font-medium">Sex</th>
+                  <th className="px-4 py-3 font-medium">Age</th>
+                  <th className="px-4 py-3"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </main>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {patients.map((p) => (
+                  <tr key={p.id} className="transition-colors hover:bg-muted/30">
+                    <td className="px-4 py-3 font-medium">
+                      {p.first_name} {p.last_name}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                      {p.mrn}
+                    </td>
+                    <td className="px-4 py-3 capitalize text-muted-foreground">
+                      {p.sex}
+                    </td>
+                    <td className="px-4 py-3 tabular-nums text-muted-foreground">
+                      {p.age}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <a
+                        href={"/patients/" + p.id}
+                        className="text-sm font-medium text-primary hover:underline"
+                      >
+                        View
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </main>
+    </div>
   );
 }
 
