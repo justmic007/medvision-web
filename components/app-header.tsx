@@ -32,7 +32,7 @@ export function AppHeader() {
     <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-8">
-          <a href="/" className="flex items-baseline gap-2">
+          <a href="/dashboard" className="flex items-baseline gap-2">
             <span className="text-lg font-semibold tracking-tight">
               MedVision
             </span>
