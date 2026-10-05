@@ -7,6 +7,7 @@ import { register as apiRegister } from "@/lib/auth";
 import { ApiError } from "@/lib/api";
 import { registerSchema, type RegisterValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
+import { PasswordInput } from "@/components/password-input";
 
 export default function RegisterPage() {
   const [serverError, setServerError] = useState("");
@@ -83,12 +84,7 @@ export default function RegisterPage() {
               error={errors.password?.message}
               hint="At least 8 characters, with a letter and a number."
             >
-              <input
-                type="password"
-                {...register("password")}
-                className="w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm focus:border-ring focus:ring-2 focus:ring-ring/30 focus:outline-none"
-                placeholder="••••••••"
-              />
+              <PasswordInput {...register("password")} />
             </Field>
 
             {serverError ? (
