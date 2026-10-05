@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [serverError, setServerError] = useState("");
 
   useEffect(() => {
-    if (user) router.replace("/");
+    if (user) router.replace("/dashboard");
   }, [user, router]);
 
   const {
@@ -28,7 +28,7 @@ export default function LoginPage() {
     setServerError("");
     try {
       await login(values.email, values.password);
-      router.push("/");
+      router.push("/dashboard");
     } catch (err) {
       setServerError(
         err instanceof ApiError ? err.message : "Login failed. Try again."
