@@ -143,7 +143,7 @@ export default function LandingPage() {
         <section className="border-t py-16">
           <h2 className="text-2xl font-semibold tracking-tight">Under the hood</h2>
           <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
-            FastAPI + TorchXRayVision + MONAI backend, Next.js frontend, Postgres,
+            FastAPI + TorchXRayVision backend, Next.js frontend, Postgres,
             S3-compatible object storage, JWT auth with an httpOnly-cookie session,
             and role-based access control with a clinician approval lifecycle.
           </p>
