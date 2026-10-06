@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
@@ -53,9 +55,9 @@ export default function LandingPage() {
             <a href={GITHUB_WEB} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">
               GitHub
             </a>
-            <a href="/login" className="font-medium text-primary hover:underline">
+            <Link href="/login" className="font-medium text-primary hover:underline">
               Sign in
-            </a>
+            </Link>
           </div>
         </div>
       </header>

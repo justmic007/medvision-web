@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Protected } from "@/components/protected";
@@ -59,12 +61,12 @@ function CaseDetailView() {
           <p className="text-sm text-destructive">{error || "Case not found."}</p>
         ) : (
           <>
-            <a
+            <Link
               href={"/patients/" + c.patient_id}
               className="text-sm font-medium text-muted-foreground hover:text-foreground"
             >
               Back to patient
-            </a>
+            </Link>
             <div className="mt-4">
               <p className="font-mono text-xs uppercase tracking-widest text-primary">
                 Case

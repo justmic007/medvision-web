@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -55,12 +57,12 @@ export default function RegisterPage() {
               We&apos;ve sent a verification link. After you verify, an admin must
               approve your account before you can sign in.
             </p>
-            <a
+            <Link
               href="/login"
               className="inline-block text-sm font-medium text-primary hover:underline"
             >
               Back to sign in
-            </a>
+            </Link>
           </div>
         ) : (
           <form
@@ -97,9 +99,9 @@ export default function RegisterPage() {
 
             <p className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
-              <a href="/login" className="font-medium text-primary hover:underline">
+              <Link href="/login" className="font-medium text-primary hover:underline">
                 Sign in
-              </a>
+              </Link>
             </p>
           </form>
         )}

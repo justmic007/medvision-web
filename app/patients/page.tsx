@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Protected } from "@/components/protected";
 import { AppHeader } from "@/components/app-header";
@@ -26,7 +27,7 @@ function PatientsView() {
     <div className="min-h-screen">
       <AppHeader />
       <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
-        <div className="flex items-end justify-between">
+        <div className="flex items-end justify-between gap-4">
           <div>
             <p className="font-mono text-xs uppercase tracking-widest text-primary">
               Records
@@ -38,9 +39,9 @@ function PatientsView() {
               Your patients and their case history.
             </p>
           </div>
-          <a href="/patients/new">
+          <Link href="/patients/new">
             <Button size="lg">Add patient</Button>
-          </a>
+          </Link>
         </div>
 
         {loading ? (
@@ -53,50 +54,74 @@ function PatientsView() {
             <p className="mt-1 text-sm text-muted-foreground">
               Add your first patient to start building case history.
             </p>
-            <a href="/patients/new" className="mt-4 inline-block">
+            <Link href="/patients/new" className="mt-4 inline-block">
               <Button>Add patient</Button>
-            </a>
+            </Link>
           </div>
         ) : (
-          <div className="mt-8 overflow-hidden rounded-xl border border-border">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-border bg-muted/40">
-                <tr className="text-muted-foreground">
-                  <th className="px-4 py-3 font-medium">Name</th>
-                  <th className="px-4 py-3 font-medium">MRN</th>
-                  <th className="px-4 py-3 font-medium">Sex</th>
-                  <th className="px-4 py-3 font-medium">Age</th>
-                  <th className="px-4 py-3"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {patients.map((p) => (
-                  <tr key={p.id} className="transition-colors hover:bg-muted/30">
-                    <td className="px-4 py-3 font-medium">
-                      {p.first_name} {p.last_name}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                      {p.mrn}
-                    </td>
-                    <td className="px-4 py-3 capitalize text-muted-foreground">
-                      {p.sex}
-                    </td>
-                    <td className="px-4 py-3 tabular-nums text-muted-foreground">
-                      {p.age}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <a
-                        href={"/patients/" + p.id}
-                        className="text-sm font-medium text-primary hover:underline"
-                      >
-                        View
-                      </a>
-                    </td>
+          <>
+            <div className="mt-8 hidden overflow-hidden rounded-xl border border-border sm:block">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-border bg-muted/40">
+                  <tr className="text-muted-foreground">
+                    <th className="px-4 py-3 font-medium">Name</th>
+                    <th className="px-4 py-3 font-medium">MRN</th>
+                    <th className="px-4 py-3 font-medium">Sex</th>
+                    <th className="px-4 py-3 font-medium">Age</th>
+                    <th className="px-4 py-3"></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {patients.map((p) => (
+                    <tr key={p.id} className="transition-colors hover:bg-muted/30">
+                      <td className="px-4 py-3 font-medium">
+                        {p.first_name} {p.last_name}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                        {p.mrn}
+                      </td>
+                      <td className="px-4 py-3 capitalize text-muted-foreground">
+                        {p.sex}
+                      </td>
+                      <td className="px-4 py-3 tabular-nums text-muted-foreground">
+                        {p.age}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <Link
+                          href={"/patients/" + p.id}
+                          className="text-sm font-medium text-primary hover:underline"
+                        >
+                          View
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-8 space-y-3 sm:hidden">
+              {patients.map((p) => (
+                <Link
+                  key={p.id}
+                  href={"/patients/" + p.id}
+                  className="block rounded-xl border border-border p-4 transition-colors hover:bg-muted/30"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-medium">
+                      {p.first_name} {p.last_name}
+                    </p>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {p.mrn}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-sm capitalize text-muted-foreground">
+                    {p.sex} · {p.age}y
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </>
         )}
       </main>
     </div>

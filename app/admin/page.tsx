@@ -10,10 +10,7 @@ import type { ClinicianStatus, ClinicianSummary } from "@/types/admin";
 
 type Target = "approved" | "rejected" | "suspended";
 
-const ACTIONS: Record<
-  ClinicianStatus,
-  { label: string; status: Target }[]
-> = {
+const ACTIONS: Record<ClinicianStatus, { label: string; status: Target }[]> = {
   pending: [
     { label: "Approve", status: "approved" },
     { label: "Reject", status: "rejected" },
@@ -23,7 +20,6 @@ const ACTIONS: Record<
   rejected: [{ label: "Reinstate", status: "approved" }],
 };
 
-// Access-removing actions ask for confirmation; granting actions don't.
 const CONFIRM: Partial<
   Record<Target, { title: (email: string) => string; body: string; label: string }>
 > = {
@@ -45,6 +41,19 @@ const PILL: Record<ClinicianStatus, string> = {
   suspended: "bg-orange-50 text-orange-700 border-orange-200",
   rejected: "bg-red-50 text-red-700 border-red-200",
 };
+
+function StatusPill({ status }: { status: ClinicianStatus }) {
+  return (
+    <span
+      className={
+        "inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize " +
+        PILL[status]
+      }
+    >
+      {status}
+    </span>
+  );
+}
 
 function AdminView() {
   const [clinicians, setClinicians] = useState<ClinicianSummary[]>([]);
@@ -84,11 +93,25 @@ function AdminView() {
   }
 
   function onAction(clinician: ClinicianSummary, status: Target) {
-    if (CONFIRM[status]) {
-      setPending({ clinician, status }); // show confirm dialog
-    } else {
-      apply(clinician.id, status); // grant actions apply directly
-    }
+    if (CONFIRM[status]) setPending({ clinician, status });
+    else apply(clinician.id, status);
+  }
+
+  function ActionButtons({ c }: { c: ClinicianSummary }) {
+    return (
+      <div className="flex gap-2">
+        {ACTIONS[c.status].map((a) => (
+          <button
+            key={a.status}
+            onClick={() => onAction(c, a.status)}
+            disabled={busyId === c.id}
+            className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50"
+          >
+            {a.label}
+          </button>
+        ))}
+      </div>
+    );
   }
 
   const confirm = pending ? CONFIRM[pending.status] : undefined;
@@ -117,52 +140,55 @@ function AdminView() {
             </p>
           </div>
         ) : (
-          <div className="mt-8 overflow-hidden rounded-xl border border-border">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-border bg-muted/40">
-                <tr className="text-muted-foreground">
-                  <th className="px-4 py-3 font-medium">Email</th>
-                  <th className="px-4 py-3 font-medium">Verified</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 text-right font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {clinicians.map((c) => (
-                  <tr key={c.id} className="transition-colors hover:bg-muted/30">
-                    <td className="px-4 py-3 font-medium">{c.email}</td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {c.email_verified ? "Yes" : "No"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={
-                          "inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize " +
-                          PILL[c.status]
-                        }
-                      >
-                        {c.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-end gap-2">
-                        {ACTIONS[c.status].map((a) => (
-                          <button
-                            key={a.status}
-                            onClick={() => onAction(c, a.status)}
-                            disabled={busyId === c.id}
-                            className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-50"
-                          >
-                            {a.label}
-                          </button>
-                        ))}
-                      </div>
-                    </td>
+          <>
+            <div className="mt-8 hidden overflow-hidden rounded-xl border border-border sm:block">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-border bg-muted/40">
+                  <tr className="text-muted-foreground">
+                    <th className="px-4 py-3 font-medium">Email</th>
+                    <th className="px-4 py-3 font-medium">Verified</th>
+                    <th className="px-4 py-3 font-medium">Status</th>
+                    <th className="px-4 py-3 text-right font-medium">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {clinicians.map((c) => (
+                    <tr key={c.id} className="transition-colors hover:bg-muted/30">
+                      <td className="px-4 py-3 font-medium">{c.email}</td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {c.email_verified ? "Yes" : "No"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusPill status={c.status} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex justify-end">
+                          <ActionButtons c={c} />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-8 space-y-3 sm:hidden">
+              {clinicians.map((c) => (
+                <div key={c.id} className="rounded-xl border border-border p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="font-medium break-all">{c.email}</p>
+                    <StatusPill status={c.status} />
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {c.email_verified ? "Email verified" : "Not verified"}
+                  </p>
+                  <div className="mt-4">
+                    <ActionButtons c={c} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </main>
 
