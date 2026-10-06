@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Protected } from "@/components/protected";
@@ -38,12 +39,12 @@ function PatientDetailView() {
     <div className="min-h-screen">
       <AppHeader />
       <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6">
-        <a
+        <Link
           href="/patients"
           className="text-sm font-medium text-muted-foreground hover:text-foreground"
         >
           Back to patients
-        </a>
+        </Link>
 
         {loading ? (
           <p className="mt-6 text-sm text-muted-foreground">Loading...</p>
@@ -71,44 +72,63 @@ function PatientDetailView() {
                 <p className="mt-1 text-sm text-muted-foreground">
                   Analyze a chest X-ray for this patient to create a case.
                 </p>
-                <a href="/analyze" className="mt-4 inline-block">
+                <Link href="/analyze" className="mt-4 inline-block">
                   <span className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90">
                     New analysis
                   </span>
-                </a>
+                </Link>
               </div>
             ) : (
-              <div className="mt-4 overflow-hidden rounded-xl border border-border">
-                <table className="w-full text-left text-sm">
-                  <thead className="border-b border-border bg-muted/40">
-                    <tr className="text-muted-foreground">
-                      <th className="px-4 py-3 font-medium">Date</th>
-                      <th className="px-4 py-3 font-medium">Model</th>
-                      <th className="px-4 py-3"></th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {cases.map((c) => (
-                      <tr key={c.id} className="transition-colors hover:bg-muted/30">
-                        <td className="px-4 py-3">
-                          {new Date(c.created_at).toLocaleString()}
-                        </td>
-                        <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                          {c.model_name}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <a
-                            href={"/cases/" + c.id}
-                            className="text-sm font-medium text-primary hover:underline"
-                          >
-                            View case
-                          </a>
-                        </td>
+              <>
+                <div className="mt-4 hidden overflow-hidden rounded-xl border border-border sm:block">
+                  <table className="w-full text-left text-sm">
+                    <thead className="border-b border-border bg-muted/40">
+                      <tr className="text-muted-foreground">
+                        <th className="px-4 py-3 font-medium">Date</th>
+                        <th className="px-4 py-3 font-medium">Model</th>
+                        <th className="px-4 py-3"></th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {cases.map((c) => (
+                        <tr key={c.id} className="transition-colors hover:bg-muted/30">
+                          <td className="px-4 py-3">
+                            {new Date(c.created_at).toLocaleString()}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                            {c.model_name}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <Link
+                              href={"/cases/" + c.id}
+                              className="text-sm font-medium text-primary hover:underline"
+                            >
+                              View case
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mt-4 space-y-3 sm:hidden">
+                  {cases.map((c) => (
+                    <Link
+                      key={c.id}
+                      href={"/cases/" + c.id}
+                      className="block rounded-xl border border-border p-4 transition-colors hover:bg-muted/30"
+                    >
+                      <p className="font-medium">
+                        {new Date(c.created_at).toLocaleString()}
+                      </p>
+                      <p className="mt-1 font-mono text-xs text-muted-foreground">
+                        {c.model_name}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              </>
             )}
           </>
         )}

@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useAuth } from "@/lib/auth-context";
 import { Protected } from "@/components/protected";
 import { AppHeader } from "@/components/app-header";
@@ -67,7 +69,7 @@ function ActionCard({
   primary?: boolean;
 }) {
   return (
-    <a
+    <Link
       href={href}
       className={
         "group flex flex-col rounded-xl border p-6 transition-colors " +
@@ -86,7 +88,7 @@ function ActionCard({
       >
         Open
       </span>
-    </a>
+    </Link>
   );
 }
 

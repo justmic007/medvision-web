@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -40,12 +42,12 @@ function NewPatientView() {
     <div className="min-h-screen">
       <AppHeader />
       <main className="mx-auto w-full max-w-lg px-4 py-10 sm:px-6">
-        <a
+        <Link
           href="/patients"
           className="text-sm font-medium text-muted-foreground hover:text-foreground"
         >
           Back to patients
-        </a>
+        </Link>
         <h1 className="mt-4 text-3xl font-semibold tracking-tight">
           Add patient
         </h1>
