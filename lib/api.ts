@@ -27,7 +27,7 @@ export function getAccessToken() {
 type Options = Omit<RequestInit, "body"> & { body?: unknown };
 
 // Endpoints that must NOT trigger the refresh-retry loop (to avoid recursion).
-const NO_RETRY = ["/auth/login", "/auth/refresh", "/auth/register"];
+const NO_RETRY = ["/auth/login", "/auth/demo-login", "/auth/refresh", "/auth/register"];
 
 async function request<T>(path: string, options: Options, retry: boolean): Promise<T> {
   const { body, headers, ...rest } = options;
@@ -149,4 +149,15 @@ export async function apiBlob(path: string, retry = true): Promise<Blob> {
     throw new ApiError(res.status, res.statusText);
   }
   return res.blob();
+}
+
+// True when an error is the backend's demo read-only guard (403 demo_read_only),
+// so write actions can show a friendly "this demo is read-only" message instead
+// of surfacing a raw error.
+export function isDemoReadOnly(err: unknown): boolean {
+  return (
+    err instanceof ApiError &&
+    err.status === 403 &&
+    err.message === "demo_read_only"
+  );
 }

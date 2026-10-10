@@ -2,12 +2,23 @@
 // manages automatically; we only handle the in-memory access token here.
 
 import { api } from "@/lib/api";
+import type { DemoRole } from "@/lib/demo-accounts";
 import type { AccessTokenResponse, User } from "@/types/auth";
 
 export function login(email: string, password: string) {
   return api<AccessTokenResponse>("/auth/login", {
     method: "POST",
     body: { email, password },
+  });
+}
+
+// Role-only demo sign-in. Sends just { role }; the backend resolves it to a
+// flagged demo account and sets the same httpOnly refresh cookie as /login.
+// No email or password is ever sent from the client.
+export function demoLogin(role: DemoRole) {
+  return api<AccessTokenResponse>("/auth/demo-login", {
+    method: "POST",
+    body: { role },
   });
 }
 

@@ -10,16 +10,19 @@ import {
 import { setAccessToken } from "@/lib/api";
 import {
   login as apiLogin,
+  demoLogin as apiDemoLogin,
   logout as apiLogout,
   getMe,
   refreshAccessToken,
 } from "@/lib/auth";
+import type { DemoRole } from "@/lib/demo-accounts";
 import type { User } from "@/types/auth";
 
 interface AuthState {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  demoLogin: (role: DemoRole) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -53,6 +56,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(me);
   }
 
+  async function demoLogin(role: DemoRole) {
+    const { access_token } = await apiDemoLogin(role);
+    setAccessToken(access_token);
+    const me = await getMe();
+    setUser(me);
+  }
+
   async function logout() {
     try {
       await apiLogout();
@@ -63,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, demoLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );

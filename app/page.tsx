@@ -9,14 +9,8 @@ import { useAuth } from "@/lib/auth-context";
 const GITHUB_API = "https://github.com/justmic007/medvision-api";
 const GITHUB_WEB = "https://github.com/justmic007/medvision-web";
 
-// Demo accounts (synthetic data) backing the one-click Explore buttons.
-const DEMO = {
-  clinician: { email: "demo-clinician@medvision.dev", password: "DemoPass123!" },
-  admin: { email: "demo-admin@medvision.dev", password: "DemoPass123!" },
-};
-
 export default function LandingPage() {
-  const { user, login } = useAuth();
+  const { user, demoLogin } = useAuth();
   const router = useRouter();
   const [busy, setBusy] = useState<"clinician" | "admin" | null>(null);
   const [error, setError] = useState("");
@@ -30,7 +24,7 @@ export default function LandingPage() {
     setBusy(role);
     setError("");
     try {
-      await login(DEMO[role].email, DEMO[role].password);
+      await demoLogin(role);
       router.push("/dashboard");
     } catch {
       setError(
