@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Protected } from "@/components/protected";
 import { AppHeader } from "@/components/app-header";
 import { Button } from "@/components/ui/button";
-import { ApiError } from "@/lib/api";
+import { ApiError, isDemoReadOnly } from "@/lib/api";
 import { createPatient } from "@/lib/patients";
 import { patientSchema, type PatientFormValues } from "@/lib/validation";
 
@@ -30,7 +30,11 @@ function NewPatientView() {
       router.push("/patients");
     } catch (err) {
       setServerError(
-        err instanceof ApiError ? err.message : "Could not create patient."
+        isDemoReadOnly(err)
+          ? "This is a read-only demo — new patients aren't saved."
+          : err instanceof ApiError
+          ? err.message
+          : "Could not create patient."
       );
     }
   }

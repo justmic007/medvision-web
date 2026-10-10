@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Protected } from "@/components/protected";
 import { AppHeader } from "@/components/app-header";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { ApiError } from "@/lib/api";
+import { ApiError, isDemoReadOnly } from "@/lib/api";
 import { listClinicians, changeClinicianStatus } from "@/lib/admin";
 import type { ClinicianStatus, ClinicianSummary } from "@/types/admin";
 
@@ -85,7 +85,13 @@ function AdminView() {
         )
       );
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : "Action failed.");
+      setError(
+        isDemoReadOnly(e)
+          ? "This is a read-only demo — only the sample demo clinician can be changed."
+          : e instanceof ApiError
+          ? e.message
+          : "Action failed."
+      );
     } finally {
       setBusyId(null);
       setPending(null);
