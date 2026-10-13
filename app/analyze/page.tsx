@@ -192,6 +192,25 @@ function ResultsSummary({ result }: { result: AnalysisResponse }) {
   );
 }
 
+function ExternalLinkIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="ml-1 inline-block h-3 w-3 shrink-0 align-[-0.1em]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </svg>
+  );
+}
+
 function Findings({ result }: { result: AnalysisResponse }) {
   const withHeatmap = result.findings.filter((f) => f.heatmap_base64);
   return (
@@ -237,16 +256,17 @@ function Findings({ result }: { result: AnalysisResponse }) {
                 </p>
               </div>
               {f.articles.length > 0 ? (
-                <ul className="mt-2 space-y-1">
+                <ul className="mt-2 space-y-1.5">
                   {f.articles.map((a) => (
                     <li key={a.pmid} className="text-sm leading-relaxed">
                       <a
                         href={a.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-foreground underline decoration-border underline-offset-2 hover:decoration-foreground"
+                        className="font-medium text-primary underline decoration-primary/50 decoration-1 underline-offset-2 transition-colors hover:text-primary/80 hover:decoration-primary"
                       >
                         {a.title}
+                        <ExternalLinkIcon />
                       </a>{" "}
                       <span className="text-muted-foreground">
                         {a.journal} ({a.year})
@@ -254,7 +274,11 @@ function Findings({ result }: { result: AnalysisResponse }) {
                     </li>
                   ))}
                 </ul>
-              ) : null}
+              ) : (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  No linked references for this finding.
+                </p>
+              )}
             </div>
           ))}
         </div>
