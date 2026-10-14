@@ -112,10 +112,7 @@ function AnalyzeView() {
             ) : null}
 
             <div className="mt-5">
-              <label
-                htmlFor="patient"
-                className="text-sm font-medium"
-              >
+              <label htmlFor="patient" className="text-sm font-medium">
                 Save as a case for a patient{" "}
                 <span className="text-muted-foreground">(optional)</span>
               </label>
@@ -211,6 +208,29 @@ function ExternalLinkIcon() {
   );
 }
 
+// Confidence bar: fill to the model's confidence, with a marker at the 50%
+// operating point (the present/absent boundary). Fill past the marker = stronger.
+function ConfidenceBar({ value }: { value: number }) {
+  const pct = Math.max(0, Math.min(100, value * 100));
+  return (
+    <div className="relative mt-2 h-1.5 w-full rounded-full bg-muted">
+      <div
+        className="absolute inset-y-0 left-0 rounded-full bg-primary/85"
+        style={{ width: `${pct}%` }}
+      />
+      <div
+        className="absolute -inset-y-1 w-px bg-foreground/50"
+        style={{ left: "50%" }}
+        title="Operating point (50%)"
+      />
+    </div>
+  );
+}
+
+function pctLabel(p: number) {
+  return `${Math.round(p * 100)}% confidence`;
+}
+
 function Findings({ result }: { result: AnalysisResponse }) {
   const withHeatmap = result.findings.filter((f) => f.heatmap_base64);
   return (
@@ -235,7 +255,7 @@ function Findings({ result }: { result: AnalysisResponse }) {
                 <div className="p-3">
                   <p className="font-medium">{f.name}</p>
                   <p className="font-mono text-xs text-muted-foreground">
-                    p {f.probability.toFixed(2)} / thr {f.threshold.toFixed(3)}
+                    {pctLabel(f.probability)}
                   </p>
                 </div>
               </div>
@@ -245,43 +265,53 @@ function Findings({ result }: { result: AnalysisResponse }) {
       ) : null}
 
       <div>
-        <h2 className="text-xl font-semibold">All findings</h2>
-        <div className="mt-4 divide-y divide-border rounded-xl border border-border">
-          {result.findings.map((f) => (
-            <div key={f.name} className="p-4">
-              <div className="flex items-center justify-between gap-4">
-                <p className="font-medium">{f.name}</p>
-                <p className="shrink-0 font-mono text-xs text-muted-foreground">
-                  {f.probability.toFixed(2)} / thr {f.threshold.toFixed(3)}
-                </p>
+        <h2 className="text-xl font-semibold">Detected findings</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Confidence is the model&rsquo;s score for each pathology. A finding is
+          shown when confidence reaches the 50% operating point (the marker on
+          each bar); the further past it, the stronger the signal.
+        </p>
+        {result.findings.length === 0 ? (
+          <div className="mt-4 rounded-xl border border-dashed border-border p-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              No findings reached the operating point for this image.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-4 divide-y divide-border rounded-xl border border-border">
+            {result.findings.map((f) => (
+              <div key={f.name} className="p-4">
+                <div className="flex items-baseline justify-between gap-4">
+                  <p className="font-medium">{f.name}</p>
+                  <p className="shrink-0 font-mono text-xs font-semibold tabular-nums">
+                    {pctLabel(f.probability)}
+                  </p>
+                </div>
+                <ConfidenceBar value={f.probability} />
+                {f.articles.length > 0 ? (
+                  <ul className="mt-3 space-y-1.5">
+                    {f.articles.map((a) => (
+                      <li key={a.pmid} className="text-sm leading-relaxed">
+                        <a
+                          href={a.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-primary underline decoration-primary/50 decoration-1 underline-offset-2 transition-colors hover:text-primary/80 hover:decoration-primary"
+                        >
+                          {a.title}
+                          <ExternalLinkIcon />
+                        </a>{" "}
+                        <span className="text-muted-foreground">
+                          {a.journal} ({a.year})
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </div>
-              {f.articles.length > 0 ? (
-                <ul className="mt-2 space-y-1.5">
-                  {f.articles.map((a) => (
-                    <li key={a.pmid} className="text-sm leading-relaxed">
-                      <a
-                        href={a.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-medium text-primary underline decoration-primary/50 decoration-1 underline-offset-2 transition-colors hover:text-primary/80 hover:decoration-primary"
-                      >
-                        {a.title}
-                        <ExternalLinkIcon />
-                      </a>{" "}
-                      <span className="text-muted-foreground">
-                        {a.journal} ({a.year})
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-2 text-xs text-muted-foreground">
-                  No linked references for this finding.
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
