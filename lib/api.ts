@@ -90,6 +90,13 @@ export function getHealth() {
   return api<{ status: string; app: string; version: string }>("/health");
 }
 
+// Fire-and-forget warm-up: wakes the free-tier backend instance and preloads
+// the ONNX model, so the first /analyze isn't slowed by a cold start + model
+// load. Public endpoint; safe to call before login. Caller ignores failures.
+export function warmup() {
+  return api<{ status: string }>("/warmup");
+}
+
 
 // Multipart upload (for /analyze). FormData sets its own Content-Type boundary,
 // so we must NOT set Content-Type ourselves. Reuses the access token + refresh.
