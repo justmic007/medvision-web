@@ -231,6 +231,10 @@ function pctLabel(p: number) {
   return `${Math.round(p * 100)}% confidence`;
 }
 
+function humanizeName(name: string) {
+  return name.replace(/_/g, " ");
+}
+
 function Findings({ result }: { result: AnalysisResponse }) {
   const withHeatmap = result.findings.filter((f) => f.heatmap_base64);
   return (
@@ -253,7 +257,7 @@ function Findings({ result }: { result: AnalysisResponse }) {
                   className="w-full"
                 />
                 <div className="p-3">
-                  <p className="font-medium">{f.name}</p>
+                  <p className="font-medium">{humanizeName(f.name)}</p>
                   <p className="font-mono text-xs text-muted-foreground">
                     {pctLabel(f.probability)}
                   </p>
@@ -282,7 +286,7 @@ function Findings({ result }: { result: AnalysisResponse }) {
             {result.findings.map((f) => (
               <div key={f.name} className="p-4">
                 <div className="flex items-baseline justify-between gap-4">
-                  <p className="font-medium">{f.name}</p>
+                  <p className="font-medium">{humanizeName(f.name)}</p>
                   <p className="shrink-0 font-mono text-xs font-semibold tabular-nums">
                     {pctLabel(f.probability)}
                   </p>

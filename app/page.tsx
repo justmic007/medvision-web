@@ -28,7 +28,7 @@ export default function LandingPage() {
       router.push("/dashboard");
     } catch {
       setError(
-        "Could not start the demo. The server may be waking up — give it ~30s and try again."
+        "Could not start the demo. Please try again in a moment."
       );
       setBusy(null);
     }
@@ -80,18 +80,22 @@ export default function LandingPage() {
               disabled={busy !== null}
               className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
             >
-              {busy === "clinician" ? "Starting demo…" : "Explore as a clinician"}
+              {busy === "clinician" ? "Spinning up the demo…" : "Explore as a clinician"}
             </button>
             <button
               onClick={() => explore("admin")}
               disabled={busy !== null}
               className="inline-flex items-center justify-center rounded-lg border border-border px-6 py-3 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-60"
             >
-              {busy === "admin" ? "Starting demo…" : "Explore as an admin"}
+              {busy === "admin" ? "Starting demo…" : "Spinning up the demo…"}
             </button>
           </div>
           {error ? (
             <p className="mt-3 text-sm text-destructive">{error}</p>
+          ) : busy ? (
+            <p className="mt-3 text-xs text-muted-foreground">
+              Setting up your demo session — this may take a moment.
+            </p>
           ) : (
             <p className="mt-3 text-xs text-muted-foreground">
               One click — no sign-up. Demo accounts use synthetic data only.
