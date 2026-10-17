@@ -80,14 +80,16 @@ export default function LandingPage() {
               disabled={busy !== null}
               className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
             >
-              {busy === "clinician" ? "Spinning up the demo…" : "Explore as a clinician"}
+              {busy === "clinician" ? <Spinner /> : null}
+              Explore as a clinician
             </button>
             <button
               onClick={() => explore("admin")}
               disabled={busy !== null}
               className="inline-flex items-center justify-center rounded-lg border border-border px-6 py-3 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-60"
             >
-              {busy === "admin" ? "Starting demo…" : "Spinning up the demo…"}
+              {busy === "admin" ? <Spinner /> : null}
+              Explore as an admin
             </button>
           </div>
           {error ? (
@@ -174,5 +176,30 @@ function Feature({ title, body }: { title: string; body: string }) {
       <h3 className="font-semibold">{title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{body}</p>
     </div>
+  );
+}
+
+function Spinner() {
+  return (
+    <svg
+      className="mr-2 h-4 w-4 animate-spin"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 0 1 8-8V0C5.37 0 0 5.37 0 12h4z"
+      />
+    </svg>
   );
 }
