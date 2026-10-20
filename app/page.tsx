@@ -86,8 +86,7 @@ export default function LandingPage() {
             <button
               onClick={() => explore("admin")}
               disabled={busy !== null}
-              className="inline-flex items-center justify-center rounded-lg border border-border px-6 py-3 text-sm font-medium transition-colors hover:bg-muted disabled:opacity-60"
-            >
+              className="inline-flex items-center justify-center rounded-lg border border-border px-6 py-3 text-sm font-medium transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary disabled:opacity-60"            >
               {busy === "admin" ? <Spinner /> : null}
               Explore as an admin
             </button>
