@@ -115,27 +115,34 @@ function CaseDetailView() {
               </div>
             </div>
 
-            <h2 className="mt-12 text-xl font-semibold">All findings</h2>
+            <h2 className="mt-12 text-xl font-semibold">Detected findings</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Confidence is the model&rsquo;s score for each pathology. A finding is
+              shown when confidence reaches the 50% operating point (the marker on
+              each bar); the further past it, the stronger the signal.
+            </p>
             <div className="mt-4 divide-y divide-border rounded-xl border border-border">
-              {c.results.findings.map((f) => (
+              {(c.results.findings ?? []).map((f) => (
                 <div key={f.name} className="p-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <p className="font-medium">{f.name}</p>
-                    <p className="shrink-0 font-mono text-xs text-muted-foreground">
-                      {f.probability.toFixed(2)} / thr {f.threshold.toFixed(3)}
+                  <div className="flex items-baseline justify-between gap-4">
+                    <p className="font-medium">{humanizeName(f.name)}</p>
+                    <p className="shrink-0 font-mono text-xs font-semibold tabular-nums">
+                      {pctLabel(f.probability)}
                     </p>
                   </div>
-                  {f.articles.length > 0 ? (
-                    <ul className="mt-2 space-y-1">
+                  <ConfidenceBar value={f.probability} />
+                  {f.articles && f.articles.length > 0 ? (
+                    <ul className="mt-3 space-y-1.5">
                       {f.articles.map((a) => (
                         <li key={a.pmid} className="text-sm leading-relaxed">
                           <a
                             href={a.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-foreground underline decoration-border underline-offset-2 hover:decoration-foreground"
+                            className="font-medium text-primary underline decoration-primary/50 decoration-1 underline-offset-2 transition-colors hover:text-primary/80 hover:decoration-primary"
                           >
                             {a.title}
+                            <ExternalLinkIcon />
                           </a>{" "}
                           <span className="text-muted-foreground">
                             {a.journal} ({a.year})
@@ -151,6 +158,50 @@ function CaseDetailView() {
         )}
       </main>
     </div>
+  );
+}
+
+function humanizeName(name: string) {
+  return (name ?? "").replace(/_/g, " ");
+}
+
+function pctLabel(p: number) {
+  return Number.isFinite(p) ? `${Math.round(p * 100)}% confidence` : "—";
+}
+
+function ConfidenceBar({ value }: { value: number }) {
+  const pct = Number.isFinite(value) ? Math.max(0, Math.min(100, value * 100)) : 0;
+  return (
+    <div className="relative mt-2 h-1.5 w-full rounded-full bg-muted">
+      <div
+        className="absolute inset-y-0 left-0 rounded-full bg-primary/85"
+        style={{ width: `${pct}%` }}
+      />
+      <div
+        className="absolute -inset-y-1 w-px bg-foreground/50"
+        style={{ left: "50%" }}
+        title="Operating point (50%)"
+      />
+    </div>
+  );
+}
+
+function ExternalLinkIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="ml-1 inline-block h-3 w-3 shrink-0 align-[-0.1em]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </svg>
   );
 }
 
